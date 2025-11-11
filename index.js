@@ -9,7 +9,7 @@ app.use(express.json());
 const uri = "mongodb+srv://local-server:xyKaziuHWWNlkxES@cluster0.fez2prt.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
 
-async function run() {
+             async function run() {
   try {
     await client.connect();
     await client.db("admin").command({ ping: 1 });
@@ -35,8 +35,8 @@ app.get('/details/:foodName', async (req, res) => {
     res.json(detail);
   } catch (error) {
     console.error('Error fetching detail:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
+    res.status(500).json({ error: 'Server error'});
+  }
 });
   app.get('/allreviews', async (req, res) => {
   try {
@@ -55,17 +55,17 @@ app.get('/details/:foodName', async (req, res) => {
 });
 run();
 
-// Root route
+
 app.get('/', (req, res) => res.send('Server is running'));
 
-// Reviews route to fetch all reviews from the collection
-app.get('/reviews', async (req, res) => {
-  try {
-    const database = client.db('local-server');  // your database name
-    const reviewsCollection = database.collection('reviews'); // your collection name
-    const reviews = await reviewsCollection.find({}).toArray(); // get all reviews
+    app.get('/reviews', async (req, res) => {
+      try {
+    const database = client.db('local-server');  
+    const reviewsCollection = database.collection('reviews');
+    const reviews = await reviewsCollection.find({}).toArray(); 
     res.json(reviews);
   } catch (error) {
+    
     console.error('Failed to fetch reviews:', error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
