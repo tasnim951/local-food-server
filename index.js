@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb'); // <-- Add ObjectId here
 
 const app = express();
 app.use(cors());
@@ -39,7 +39,6 @@ app.get('/details/:foodName', async (req, res) => {
   }
 });
 
-
 app.get('/allreviews', async (req, res) => {
   try {
     const database = client.db('local-server');
@@ -56,7 +55,6 @@ app.get('/allreviews', async (req, res) => {
   }
 });
 
-
 app.get('/reviews', async (req, res) => {
   try {
     const database = client.db('local-server');
@@ -69,12 +67,30 @@ app.get('/reviews', async (req, res) => {
   }
 });
 
-// *** ADD THIS POST /reviews ROUTE ***
+// New route for fetching reviews by user email
+app.get('/myreviews/:userEmail', async (req, res) => {
+  try {
+    const userEmail = decodeURIComponent(req.params.userEmail);
+
+    const database = client.db('local-server');
+    const reviewsCollection = database.collection('reviews');
+
+    const userReviews = await reviewsCollection
+      .find({ userEmail: userEmail })
+      .sort({ reviewDate: -1 })
+      .toArray();
+
+    res.json(userReviews);
+  } catch (error) {
+    console.error('Failed to fetch user reviews:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
 app.post('/reviews', async (req, res) => {
   try {
     const review = req.body;
 
-    // Basic validation
     if (
       !review.foodName ||
       !review.foodImage ||
@@ -103,8 +119,65 @@ app.post('/reviews', async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => res.send('Server is running!'));
+// DELETE route to delete a review by id
+app.delete('/reviews/:id', async (req, res) => {
+  try {
+    const reviewId = req.params.id;
 
+    if (!ObjectId.isValid(reviewId)) {
+      return res.status(400).json({ message: 'Invalid review ID' });
+    }
+
+    const database = client.db('local-server');
+    const reviewsCollection = database.collection('reviews');
+
+    const result = await reviewsCollection.deleteOne({ _id: new ObjectId(reviewId) });
+
+    if (result.deletedCount === 1) {
+      return res.status(200).json({ message: 'Review deleted successfully' });
+    } else {
+      return res.status(404).json({ message: 'Review not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting review:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+// PUT route to update a review by id
+app.put('/reviews/:id', async (req, res) => {
+  try {
+    const reviewId = req.params.id;
+    const updateData = req.body;
+
+    if (!ObjectId.isValid(reviewId)) {
+      return res.status(400).json({ message: 'Invalid review ID' });
+    }
+
+    const database = client.db('local-server');
+    const reviewsCollection = database.collection('reviews');
+
+    const result = await reviewsCollection.updateOne(
+      { _id: new ObjectId(reviewId) },
+      { $set: updateData }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
+
+    if (result.modifiedCount === 1) {
+      return res.status(200).json({ message: 'Review updated successfully' });
+    } else {
+      return res.status(200).json({ message: 'No changes made to the review' });
+    }
+  } catch (error) {
+    console.error('Error updating review:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+app.get('/', (req, res) => res.send('Server is running!'));
 
 const PORT = process.env.PORT || 5000;
 
