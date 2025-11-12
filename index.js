@@ -10,15 +10,16 @@ const uri = "mongodb+srv://local-server:xyKaziuHWWNlkxES@cluster0.fez2prt.mongod
 const client = new MongoClient(uri);
 
              async function run() {
-  try {
+   
+                try {
     await client.connect();
     await client.db("admin").command({ ping: 1 });
-    console.log("Successfully connected to MongoDB Atlas!");
+    console.log("Successfully connected to MongoDB ");
   } catch (error) {
     console.error("MongoDB connection error:", error);
   }
 }
-app.get('/details/:foodName', async (req, res) => {
+  app.get('/details/:foodName', async (req, res) => {
   try {
     const foodName = req.params.foodName;
    
@@ -38,9 +39,10 @@ app.get('/details/:foodName', async (req, res) => {
     res.status(500).json({ error: 'Server error'});
   }
 });
-  app.get('/allreviews', async (req, res) => {
-  try {
-    const database = client.db('local-server');
+          app.get('/allreviews', async (req, res) => {
+            try {
+   
+                const database = client.db('local-server');
     const allReviewsCollection = database.collection('alldata');
     const reviews = await allReviewsCollection
       .find({})
@@ -56,7 +58,7 @@ app.get('/details/:foodName', async (req, res) => {
 run();
 
 
-app.get('/', (req, res) => res.send('Server is running'));
+app.get('/', (req, res) => res.send('Server is running!'));
 
     app.get('/reviews', async (req, res) => {
       try {
@@ -72,4 +74,4 @@ app.get('/', (req, res) => res.send('Server is running'));
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
