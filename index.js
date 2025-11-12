@@ -14,7 +14,7 @@ const client = new MongoClient(uri);
                 try {
     await client.connect();
     await client.db("admin").command({ ping: 1 });
-    console.log("Successfully connected to MongoDB ");
+    console.log("Successfully connected to MongoDB!!");
   } catch (error) {
     console.error("MongoDB connection error:", error);
   }
@@ -36,7 +36,7 @@ const client = new MongoClient(uri);
     res.json(detail);
   } catch (error) {
     console.error('Error fetching detail:', error);
-    res.status(500).json({ error: 'Server error'});
+    res.status(500).json({ error: 'Server error!Try again.'});
   }
 });
           app.get('/allreviews', async (req, res) => {
@@ -52,7 +52,7 @@ const client = new MongoClient(uri);
     res.json(reviews);
   } catch (error) {
     console.error('Failed to fetch all reviews:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ message: 'Internal Server Error!' });
   }
 });
 run();
@@ -69,7 +69,7 @@ app.get('/', (req, res) => res.send('Server is running!'));
   } catch (error) {
     
     console.error('Failed to fetch reviews:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ message: 'Internal Server Error!' });
   }
 });
 
