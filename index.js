@@ -19,7 +19,6 @@ async function run() {
   }
 }
 
-// GET detail for a specific food name
 app.get('/details/:foodName', async (req, res) => {
   try {
     const foodName = req.params.foodName;
@@ -40,7 +39,7 @@ app.get('/details/:foodName', async (req, res) => {
   }
 });
 
-// GET all reviews (sorted descending by reviewDate)
+
 app.get('/allreviews', async (req, res) => {
   try {
     const database = client.db('local-server');
@@ -57,7 +56,7 @@ app.get('/allreviews', async (req, res) => {
   }
 });
 
-// GET all reviews (generic)
+
 app.get('/reviews', async (req, res) => {
   try {
     const database = client.db('local-server');
@@ -94,9 +93,9 @@ app.post('/reviews', async (req, res) => {
     const result = await reviewsCollection.insertOne(review);
 
     if (result.insertedId) {
-      return res.status(201).json({ message: 'Review added successfully' });
+      return res.status(201).json({ message: 'Review added successfully!' });
     } else {
-      return res.status(500).json({ message: 'Failed to add review' });
+      return res.status(500).json({ message: 'Failed to add review!' });
     }
   } catch (error) {
     console.error('Error adding review:', error);
@@ -106,7 +105,7 @@ app.post('/reviews', async (req, res) => {
 
 app.get('/', (req, res) => res.send('Server is running!'));
 
-// Start server and connect to DB
+
 const PORT = process.env.PORT || 5000;
 
 run().then(() => {
