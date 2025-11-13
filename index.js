@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ObjectId } = require('mongodb'); // <-- Add ObjectId here
+const { MongoClient, ObjectId } = require('mongodb');
 
 const app = express();
 app.use(cors());
@@ -13,12 +13,13 @@ async function run() {
   try {
     await client.connect();
     await client.db("admin").command({ ping: 1 });
-    console.log("Successfully connected to MongoDB!!");
+    console.log("✅ Successfully connected to MongoDB!");
   } catch (error) {
     console.error("MongoDB connection error:", error);
   }
 }
 
+// 🔹 Fetch details by food name
 app.get('/details/:foodName', async (req, res) => {
   try {
     const foodName = req.params.foodName;
@@ -28,7 +29,6 @@ app.get('/details/:foodName', async (req, res) => {
       .findOne({ foodName: foodName });
 
     if (!detail) {
-      console.log('No details found for:', foodName);
       return res.status(404).json({ message: 'Details not found' });
     }
 
@@ -39,6 +39,7 @@ app.get('/details/:foodName', async (req, res) => {
   }
 });
 
+// 🔹 All reviews (for All Reviews page)
 app.get('/allreviews', async (req, res) => {
   try {
     const database = client.db('local-server');
@@ -55,6 +56,7 @@ app.get('/allreviews', async (req, res) => {
   }
 });
 
+// 🔹 Fetch all user reviews (general)
 app.get('/reviews', async (req, res) => {
   try {
     const database = client.db('local-server');
@@ -67,11 +69,35 @@ app.get('/reviews', async (req, res) => {
   }
 });
 
-// New route for fetching reviews by user email
+// 🔹 Get single review by ID (Edit page)
+app.get('/reviews/:id', async (req, res) => {
+  try {
+    const reviewId = req.params.id;
+
+    if (!ObjectId.isValid(reviewId)) {
+      return res.status(400).json({ message: 'Invalid review ID' });
+    }
+
+    const database = client.db('local-server');
+    const reviewsCollection = database.collection('reviews');
+
+    const review = await reviewsCollection.findOne({ _id: new ObjectId(reviewId) });
+
+    if (!review) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
+
+    res.status(200).json(review);
+  } catch (error) {
+    console.error('Error fetching single review:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+// 🔹 Fetch reviews by user email
 app.get('/myreviews/:userEmail', async (req, res) => {
   try {
     const userEmail = decodeURIComponent(req.params.userEmail);
-
     const database = client.db('local-server');
     const reviewsCollection = database.collection('reviews');
 
@@ -87,6 +113,7 @@ app.get('/myreviews/:userEmail', async (req, res) => {
   }
 });
 
+// 🔹 Add new review (auto-adds date)
 app.post('/reviews', async (req, res) => {
   try {
     const review = req.body;
@@ -102,6 +129,9 @@ app.post('/reviews', async (req, res) => {
     ) {
       return res.status(400).json({ message: 'Missing required review fields' });
     }
+
+    // ✅ Auto-add posting date if missing
+    review.reviewDate = new Date();
 
     const database = client.db('local-server');
     const reviewsCollection = database.collection('reviews');
@@ -119,7 +149,7 @@ app.post('/reviews', async (req, res) => {
   }
 });
 
-// DELETE route to delete a review by id
+// 🔹 Delete review by ID
 app.delete('/reviews/:id', async (req, res) => {
   try {
     const reviewId = req.params.id;
@@ -144,7 +174,7 @@ app.delete('/reviews/:id', async (req, res) => {
   }
 });
 
-// PUT route to update a review by id
+// 🔹 Update review (Edit)
 app.put('/reviews/:id', async (req, res) => {
   try {
     const reviewId = req.params.id;
@@ -177,7 +207,7 @@ app.put('/reviews/:id', async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => res.send('Server is running!'));
+app.get('/', (req, res) => res.send('Server is running! ✅'));
 
 const PORT = process.env.PORT || 5000;
 
