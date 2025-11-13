@@ -13,13 +13,13 @@ async function run() {
   try {
     await client.connect();
     await client.db("admin").command({ ping: 1 });
-    console.log("✅ Successfully connected to MongoDB!");
+    console.log("Successfully connected to MongoDB!");
   } catch (error) {
     console.error("MongoDB connection error:", error);
   }
 }
 
-// 🔹 Fetch details by food name
+
 app.get('/details/:foodName', async (req, res) => {
   try {
     const foodName = req.params.foodName;
@@ -39,7 +39,6 @@ app.get('/details/:foodName', async (req, res) => {
   }
 });
 
-// 🔹 All reviews (for All Reviews page)
 app.get('/allreviews', async (req, res) => {
   try {
     const database = client.db('local-server');
@@ -56,7 +55,7 @@ app.get('/allreviews', async (req, res) => {
   }
 });
 
-// 🔹 Fetch all user reviews (general)
+
 app.get('/reviews', async (req, res) => {
   try {
     const database = client.db('local-server');
@@ -69,7 +68,7 @@ app.get('/reviews', async (req, res) => {
   }
 });
 
-// 🔹 Get single review by ID (Edit page)
+
 app.get('/reviews/:id', async (req, res) => {
   try {
     const reviewId = req.params.id;
@@ -94,7 +93,7 @@ app.get('/reviews/:id', async (req, res) => {
   }
 });
 
-// 🔹 Fetch reviews by user email
+
 app.get('/myreviews/:userEmail', async (req, res) => {
   try {
     const userEmail = decodeURIComponent(req.params.userEmail);
@@ -113,9 +112,10 @@ app.get('/myreviews/:userEmail', async (req, res) => {
   }
 });
 
-// 🔹 Add new review (auto-adds date)
-app.post('/reviews', async (req, res) => {
-  try {
+
+        app.post('/reviews', async (req, res) => {
+      
+            try {
     const review = req.body;
 
     if (
@@ -130,7 +130,7 @@ app.post('/reviews', async (req, res) => {
       return res.status(400).json({ message: 'Missing required review fields' });
     }
 
-    // ✅ Auto-add posting date if missing
+   
     review.reviewDate = new Date();
 
     const database = client.db('local-server');
@@ -149,7 +149,7 @@ app.post('/reviews', async (req, res) => {
   }
 });
 
-// 🔹 Delete review by ID
+
 app.delete('/reviews/:id', async (req, res) => {
   try {
     const reviewId = req.params.id;
@@ -170,11 +170,11 @@ app.delete('/reviews/:id', async (req, res) => {
     }
   } catch (error) {
     console.error('Error deleting review:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ message: 'Internal Server Error!' });
   }
 });
 
-// 🔹 Update review (Edit)
+
 app.put('/reviews/:id', async (req, res) => {
   try {
     const reviewId = req.params.id;
@@ -207,10 +207,10 @@ app.put('/reviews/:id', async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => res.send('Server is running! ✅'));
+app.get('/', (req, res) => res.send('Server is running!!'));
 
 const PORT = process.env.PORT || 5000;
 
 run().then(() => {
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 });
